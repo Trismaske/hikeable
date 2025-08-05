@@ -74,11 +74,13 @@ class BigQuery(BaseConnection):
         """Load data to BigQuery."""
         logger.info(f"Loading data to BigQuery table: \"{self.table_id}\"")
         if self.primary_key and self.table_exists:
-            logger.info(f"Deduplicating data based on primary key: \"{self.primary_key}\"")
-            query = f"SELECT {self.primary_key} FROM `{self.table_id}`"
+            if self.dedupe_using_all_columns:
+                query = f"SELECT * FROM `{self.table_id}`"
+            else:
+                query = f"SELECT {self.primary_key} FROM `{self.table_id}`"
             try:
                 existing_df = self._query_to_dataframe(query)
-                if not existing_df.empty and self.primary_key in existing_df.columns:
+                if not existing_df.empty:
                     df = self._deduplicate_df(df, existing_df)
             except Exception as e:
                 logger.warning(f"Could not query existing keys from BigQuery. Proceeding without deduplication. Error: {e}")
@@ -94,4 +96,4 @@ class BigQuery(BaseConnection):
         job = self.bq_client.load_table_from_dataframe(df, self.table_id, job_config=job_config)
         job.result()
         table = self.bq_client.get_table(self.table_id)
-        logger.info(f"Loaded {table.num_rows} rows and {len(table.schema)} columns to {self.table_id}")
+        logger.info(f"Loaded {len(df)} rows to table (total rows: {table.num_rows}) to {self.table_id}")

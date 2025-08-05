@@ -17,6 +17,7 @@ class BaseConnection:
         self.config: Config = config
         self.connection_config: Dict[str, Any] = config.config_data[role]
         self.primary_key: str = self.connection_config.get("primary_key", "")
+        self.dedupe_using_all_columns: bool = self.connection_config.get("dedupe_using_all_columns", False)
 
     def _get_schema_for_column(self, column: str) -> Dict[str, str]:
         """Get the schema for a specific column."""
@@ -49,7 +50,18 @@ class BaseConnection:
                 raise ValueError("Dataframe columns do not match the schema.")
 
     def _deduplicate_df(self, df: pandas.DataFrame, existing_df: pandas.DataFrame) -> pandas.DataFrame:
-        """Removes rows from a dataframe that have primary keys in the existing_df."""
+        """Removes rows from a dataframe that already exist in existing_df."""
+        if self.dedupe_using_all_columns:
+            logger.info(f"Deduplicating data based on all columns.")
+            cols = df.columns.tolist()
+            merged_df = pandas.concat([existing_df, df], ignore_index=True)
+            deduplicated_df = merged_df.drop_duplicates(keep='last')
+            indicator_df = deduplicated_df.merge(existing_df, on=cols, how='left', indicator=True)
+            new_rows_df = indicator_df[indicator_df['_merge'] == 'left_only'][cols]
+            new_rows_df.reset_index(drop=True, inplace=True)
+            return new_rows_df # type: ignore
+
+        logger.info(f"Deduplicating data based on primary key: \"{self.primary_key}\"")
         if not self.primary_key:
             return df
 
@@ -57,6 +69,10 @@ class BaseConnection:
             logger.warning(f"Primary key '{self.primary_key}' not found in the dataframe. Skipping deduplication.")
             return df
         
+        if self.primary_key not in existing_df.columns:
+            logger.warning(f"Primary key '{self.primary_key}' not found in the existing data. Skipping deduplication.")
+            return df
+
         existing_keys = existing_df[self.primary_key].tolist()
         original_rows = len(df)
         df = df[~df[self.primary_key].isin(existing_keys)] # type: ignore
