@@ -12,13 +12,15 @@
     "auth": {
       "type": "disabled"
     },
-    "data_key": "hourly"
+    "data_key": "hourly",
+    "json_orientation": "columns"
   },
   "schema": [],
   "destination": {
+    "primary_key": "time",
     "type": "bigquery",
-    "project": "YOUR_PROJECT_ID",
-    "dataset": "YOUR_DATASET_ID",
-    "table": "YOUR_TABLE_ID"
+    "project": "hikeable-2025",
+    "dataset": "open_meteo",
+    "table": "san_francisco"
   }
 }

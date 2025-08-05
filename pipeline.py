@@ -18,6 +18,12 @@ def connection_factory(role: str, config: Config):
     elif connection_type == 'local_file':
         from modules.connections.local_file import LocalFile
         return LocalFile(role, config)
+    elif connection_type == 'gcs':
+        from modules.connections.gcs import GCS
+        return GCS(role, config)
+    elif connection_type == 'bigquery':
+        from modules.connections.bigquery import BigQuery
+        return BigQuery(role, config)
     else:
         raise ValueError(f"Unsupported source connection_type: {connection_type}")
 

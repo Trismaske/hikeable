@@ -17,11 +17,11 @@ class API(BaseConnection):
         """Initialize the API connection."""
         super().__init__(role, config)
         if 'url' not in self.connection_config:
-            raise ValueError("Config for \"api\" must include a 'url' key.")
+            raise ValueError(f"Config for {self.role} must include a 'url' key.")
         elif 'method' not in self.connection_config:
-            raise ValueError("Config for \"api\" must include a 'method' key.")
+            raise ValueError(f"Config for {self.role} must include a 'method' key.")
         elif 'auth' not in self.connection_config:
-            raise ValueError("Config for \"api\" must include an 'auth' key.")
+            raise ValueError(f"Config for {self.role} must include an 'auth' key.")
         self.url = self.connection_config.get("url", "")
         self.method = self.connection_config.get("method", "")
         self.headers = self.connection_config.get("headers", {})
@@ -29,6 +29,7 @@ class API(BaseConnection):
         self.body = self.connection_config.get("body", {})
         self.auth = self.connection_config.get("auth", {})
         self.data_key = self.connection_config.get("data_key", "")
+        self.json_orientation = self.connection_config.get("json_orientation", "")
         logger.info(f"Initialized API connection with URL: \"{self.url}\" and method: \"{self.method}\"")
 
     def _make_request(self, url: str, headers: Dict, params: Dict, data: Dict) -> requests.Response:
@@ -65,7 +66,10 @@ class API(BaseConnection):
             if isinstance(data, list):
                 return pd.DataFrame(data)
             elif isinstance(data, dict):
-                return pd.DataFrame([data])
+                if not self.json_orientation:
+                    return pd.DataFrame([data])
+                else:
+                    return pd.DataFrame.from_dict(data, orient=self.json_orientation)
             else:
                 raise ValueError("Unexpected data format in API response.")            
         except ValueError as e:
@@ -79,8 +83,7 @@ class API(BaseConnection):
         # To Do: implement pagination handling
         response = self._make_request(self.url, headers=self.headers, params=self.query_params, data=self.body)
         logger.info("API request successful, processing response data.")
-        response_data = response.json()
-        data = self._extract_data_from_response(response_data)
+        data = self._extract_data_from_response(response)
         df = pd.DataFrame(data)
         self._process_dataframe(df)
         return df

@@ -16,7 +16,7 @@ class LocalFile(BaseConnection):
         super().__init__(role, config)
         self.file_path: str = self.connection_config.get("file_path", "")
         if not self.file_path:
-            raise ValueError("Config for \"local_file\" must include a 'file_path' key.")
+            raise ValueError(f"Config for {self.role} must include a 'file_path' key.")
         self.file_type: str = self.connection_config.get("file_type", "")
         if self.file_type not in ["csv", "json", "parquet", "xlsx", "xml"]:
             raise ValueError(f"Unsupported file type: \"{self.file_type}\"")
@@ -25,7 +25,7 @@ class LocalFile(BaseConnection):
         
 
     def extract(self) -> pandas.DataFrame:
-        """Extract data from the local file."""
+        """Extract data from a local file."""
         logger.info(f"Extracting data from \"{self.file_type}\" at \"{self.file_path}\"")
         if not os.path.exists(self.file_path):
             raise FileNotFoundError(f"File not found at \"{self.file_path}\"")
@@ -45,7 +45,7 @@ class LocalFile(BaseConnection):
         return df
 
     def load(self, df: pandas.DataFrame):
-        """Load data to the destination."""
+        """Load data to a local file."""
         logger.info(f"Loading data to a \"{self.file_type}\" file at \"{self.file_path}\"")
         os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
         if self.file_type == "csv":

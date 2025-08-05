@@ -37,6 +37,10 @@ class Config:
                     ]
                 },
                 "data_key": {"type": "string"},
+                "json_orientation": {
+                    "type": "string",
+                    "enum": ["records", "split", "index", "columns", "values"]
+                }
             },
             "required": ["type", "url", "method", "auth"]
         },
@@ -54,10 +58,11 @@ class Config:
             "type": "object",
             "properties": {
                 "type": {"const": "bigquery"},
+                "multi_region_location": {"type": "string"},
                 "project": {"type": "string"},
                 "dataset": {"type": "string"},
                 "table": {"type": "string"},
-                "service_account_key_path": {"type": "string"}
+                "write_disposition": {"type": "string", "enum": ["truncate", "append"]}
             },
             "required": ["type", "project", "dataset", "table"]
         },
@@ -71,7 +76,7 @@ class Config:
                 "bucket": {"type": "string"},
                 "gcs_path": {"type": "string"},
             },
-            "required": ["type", "bucket", "gcs_path"]
+            "required": ["type", "file_path", "file_type", "bucket", "gcs_path"]
         }
     }
 
@@ -82,6 +87,7 @@ class Config:
                 "type": "object",
                 "properties": {
                     "type": {"type": "string", "enum": ["api", "local_file", "bigquery", "gcs"]},
+                    "primary_key": {"type": "string"},
                 },
                 "oneOf": list(_connection_definitions.values()),
                 "required": ["type"]
@@ -140,7 +146,9 @@ class Config:
     def update_schema(self, new_schema: List[Dict[str, str]]):
         """Update the schema in the config file."""
         try:
-            validate(instance=new_schema, schema=self._config_schema)
+            new_config_data = self.config_data.copy()
+            new_config_data['schema'] = new_schema
+            validate(instance=new_config_data, schema=self._config_schema)
             self.config_data['schema'] = new_schema
             with open(self.config_file_path, 'w') as f:
                 json.dump(self.config_data, f, indent=4)

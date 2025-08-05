@@ -1,7 +1,8 @@
-import logging
 import os
-from google.cloud import storage
+import logging
 import pandas
+
+from google.cloud import storage
 
 from modules.config import Config
 from modules.connections.local_file import LocalFile
@@ -16,10 +17,10 @@ class GCS(LocalFile):
         super().__init__(role, config)
         self.bucket_name = self.connection_config.get("bucket")
         if not self.bucket_name:
-            raise ValueError("Config for \"gcs\" must include a 'bucket' key.")
+            raise ValueError(f"Config for {self.role} must include a 'bucket' key.")
         self.gcs_path = self.connection_config.get("gcs_path")
         if not self.gcs_path:
-            raise ValueError("Config for \"gcs\" must include a 'gcs_path' key.")
+            raise ValueError(f"Config for {self.role} must include a 'gcs_path' key.")
         self.storage_client = storage.Client()
         self.bucket = self.storage_client.bucket(self.bucket_name)
         if not self.bucket.exists():

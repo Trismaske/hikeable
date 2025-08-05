@@ -16,6 +16,7 @@ class BaseConnection:
         self.role: str = role
         self.config: Config = config
         self.connection_config: Dict[str, Any] = config.config_data[role]
+        self.primary_key: str = self.connection_config.get("primary_key", "")
 
     def _get_schema_for_column(self, column: str) -> Dict[str, str]:
         """Get the schema for a specific column."""

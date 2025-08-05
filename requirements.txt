@@ -2,3 +2,5 @@ requests
 pandas
 jsonschema
 google-cloud-storage
+google-cloud-bigquery
+pandas-gbq
