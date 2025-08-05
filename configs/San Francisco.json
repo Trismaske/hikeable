@@ -1,26 +1,165 @@
 {
-  "source": {
-    "type": "api",
-    "url": "https://api.open-meteo.com/v1/forecast",
-    "method": "GET",
-    "query_params": {
-      "latitude": "37.79",
-      "longitude": "-122.47",
-      "hourly": "temperature_2m,precipitation_probability,apparent_temperature,dew_point_2m,relative_humidity_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,uv_index,visibility,pressure_msl,surface_pressure,wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_speed_180m,wind_direction_10m,wind_direction_80m,wind_direction_120m,wind_direction_180m,wind_gusts_10m,rain,showers,snowfall,precipitation,snow_depth,temperature_80m,temperature_120m,temperature_180m,uv_index_clear_sky,sunshine_duration,freezing_level_height",
-      "past_days": "7"
+    "source": {
+        "type": "api",
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "method": "GET",
+        "query_params": {
+            "latitude": "37.79",
+            "longitude": "-122.47",
+            "hourly": "temperature_2m,precipitation_probability,apparent_temperature,dew_point_2m,relative_humidity_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,uv_index,visibility,pressure_msl,surface_pressure,wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_speed_180m,wind_direction_10m,wind_direction_80m,wind_direction_120m,wind_direction_180m,wind_gusts_10m,rain,showers,snowfall,precipitation,snow_depth,temperature_80m,temperature_120m,temperature_180m,uv_index_clear_sky,sunshine_duration,freezing_level_height",
+            "past_days": "7",
+            "forecast_days": "7"
+        },
+        "auth": {
+            "type": "disabled"
+        },
+        "data_key": "hourly",
+        "json_orientation": "columns"
     },
-    "auth": {
-      "type": "disabled"
-    },
-    "data_key": "hourly",
-    "json_orientation": "columns"
-  },
-  "schema": [],
-  "destination": {
-    "primary_key": "time",
-    "type": "bigquery",
-    "project": "hikeable-2025",
-    "dataset": "open_meteo",
-    "table": "san_francisco"
-  }
+    "schema": [
+        {
+            "name": "time",
+            "type": "object"
+        },
+        {
+            "name": "temperature_2m",
+            "type": "float64"
+        },
+        {
+            "name": "precipitation_probability",
+            "type": "int64"
+        },
+        {
+            "name": "apparent_temperature",
+            "type": "float64"
+        },
+        {
+            "name": "dew_point_2m",
+            "type": "float64"
+        },
+        {
+            "name": "relative_humidity_2m",
+            "type": "int64"
+        },
+        {
+            "name": "cloud_cover",
+            "type": "int64"
+        },
+        {
+            "name": "cloud_cover_low",
+            "type": "int64"
+        },
+        {
+            "name": "cloud_cover_mid",
+            "type": "int64"
+        },
+        {
+            "name": "cloud_cover_high",
+            "type": "int64"
+        },
+        {
+            "name": "uv_index",
+            "type": "float64"
+        },
+        {
+            "name": "visibility",
+            "type": "float64"
+        },
+        {
+            "name": "pressure_msl",
+            "type": "float64"
+        },
+        {
+            "name": "surface_pressure",
+            "type": "float64"
+        },
+        {
+            "name": "wind_speed_10m",
+            "type": "float64"
+        },
+        {
+            "name": "wind_speed_80m",
+            "type": "float64"
+        },
+        {
+            "name": "wind_speed_120m",
+            "type": "float64"
+        },
+        {
+            "name": "wind_speed_180m",
+            "type": "float64"
+        },
+        {
+            "name": "wind_direction_10m",
+            "type": "int64"
+        },
+        {
+            "name": "wind_direction_80m",
+            "type": "int64"
+        },
+        {
+            "name": "wind_direction_120m",
+            "type": "int64"
+        },
+        {
+            "name": "wind_direction_180m",
+            "type": "int64"
+        },
+        {
+            "name": "wind_gusts_10m",
+            "type": "float64"
+        },
+        {
+            "name": "rain",
+            "type": "float64"
+        },
+        {
+            "name": "showers",
+            "type": "float64"
+        },
+        {
+            "name": "snowfall",
+            "type": "float64"
+        },
+        {
+            "name": "precipitation",
+            "type": "float64"
+        },
+        {
+            "name": "snow_depth",
+            "type": "float64"
+        },
+        {
+            "name": "temperature_80m",
+            "type": "float64"
+        },
+        {
+            "name": "temperature_120m",
+            "type": "float64"
+        },
+        {
+            "name": "temperature_180m",
+            "type": "float64"
+        },
+        {
+            "name": "uv_index_clear_sky",
+            "type": "float64"
+        },
+        {
+            "name": "sunshine_duration",
+            "type": "float64"
+        },
+        {
+            "name": "freezing_level_height",
+            "type": "float64"
+        }
+    ],
+    "destination": {
+        "primary_key": "time",
+        "dedupe_using_all_columns": true,
+        "type": "bigquery",
+        "project": "hikeable-2025",
+        "dataset": "open_meteo",
+        "table": "san_francisco"
+    }
 }
