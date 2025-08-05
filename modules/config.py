@@ -44,10 +44,11 @@ class Config:
             "type": "object",
             "properties": {
                 "type": {"const": "local_file"},
-                "path": {"type": "string"},
-                "file_type": {"type": "string", "enum": ["csv", "json", "parquet", "xlsx", "xml"]}
+                "file_path": {"type": "string"},
+                "file_type": {"type": "string", "enum": ["csv", "json", "parquet", "xlsx", "xml"]},
+                "file_type_options": {"type": "object"}
             },
-            "required": ["type", "path", "file_type"]
+            "required": ["type", "file_path", "file_type"]
         },
         "bigquery": {
             "type": "object",
@@ -64,10 +65,13 @@ class Config:
             "type": "object",
             "properties": {
                 "type": {"const": "gcs"},
+                "file_path": {"type": "string"},
+                "file_type": {"type": "string", "enum": ["csv", "json", "parquet", "xlsx", "xml"]},
+                "file_type_options": {"type": "object"},
                 "bucket": {"type": "string"},
-                "path": {"type": "string"},
+                "gcs_path": {"type": "string"},
             },
-            "required": ["type", "bucket", "path"]
+            "required": ["type", "bucket", "gcs_path"]
         }
     }
 

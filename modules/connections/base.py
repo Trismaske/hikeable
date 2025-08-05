@@ -56,6 +56,6 @@ class BaseConnection:
         """Extract data from the source."""
         raise NotImplementedError("Subclasses must implement this method.")
 
-    def load(self, data: pandas.DataFrame):
+    def load(self, df: pandas.DataFrame):
         """Load data to the destination."""
         raise NotImplementedError("Subclasses must implement this method.")

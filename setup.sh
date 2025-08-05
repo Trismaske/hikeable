@@ -28,3 +28,6 @@ pip install --upgrade pip
 # Install required packages
 echo "Installing required packages..."
 pip install -r requirements.txt
+
+# Setup GCP ADC
+gcloud auth application-default login

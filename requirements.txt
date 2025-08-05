@@ -1,3 +1,4 @@
 requests
 pandas
 jsonschema
+google-cloud-storage

@@ -9,8 +9,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def connection_factory(role: str, connection_type: str, config: Config):
+def connection_factory(role: str, config: Config):
     """Factory function to create connection objects based on the config."""
+    connection_type: str = config.config_data[role].get('type')
     if connection_type == 'api':
         from modules.connections.api import API
         return API(role, config)
@@ -33,8 +34,8 @@ def main():
     
     try:
         config = Config(args.config_file_path)
-        source = connection_factory("source", config.source['type'], config)
-        destination = connection_factory("destination", config.destination['type'], config)
+        source = connection_factory("source", config)
+        destination = connection_factory("destination", config)
         data = source.extract()
         destination.load(data)
         return 0

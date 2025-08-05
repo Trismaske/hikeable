@@ -85,11 +85,11 @@ class API(BaseConnection):
         self._process_dataframe(df)
         return df
     
-    def load(self, data: pd.DataFrame):
+    def load(self, df: pd.DataFrame):
         """Load data to the API."""
         logger.info(f"Loading data to API at \"{self.url}\" with method \"{self.method}\"")
         # To Do: enable injection of values into headers, query parameters, and body
-        data_list = data.to_dict(orient='records')
+        data_list = df.to_dict(orient='records')
         for record in data_list:
             self._make_request(self.url, headers=self.headers, params=self.query_params, data=record)
             time.sleep(0.1)
