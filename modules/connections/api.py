@@ -93,6 +93,7 @@ class API(BaseConnection):
         logger.info(f"Loading data to API at \"{self.url}\" with method \"{self.method}\"")
         # To Do: enable injection of values into headers, query parameters, and body
         data_list = df.to_dict(orient='records')
+        logger.info(f"WARNING: Unable to deduplicate data before loading to API. Ensure the API handles deduplication if necessary.")
         for record in data_list:
             self._make_request(self.url, headers=self.headers, params=self.query_params, data=record)
             time.sleep(0.1)

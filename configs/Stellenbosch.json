@@ -155,6 +155,7 @@
     ],
     "destination": {
         "primary_key": "time",
+        "dedupe_using_all_columns": true,
         "type": "bigquery",
         "project": "hikeable-2025",
         "dataset": "open_meteo",

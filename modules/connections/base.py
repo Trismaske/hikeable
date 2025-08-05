@@ -48,6 +48,23 @@ class BaseConnection:
             if set(found_columns) != set([field['name'] for field in self.config.config_data['schema']]):
                 raise ValueError("Dataframe columns do not match the schema.")
 
+    def _deduplicate_df(self, df: pandas.DataFrame, existing_df: pandas.DataFrame) -> pandas.DataFrame:
+        """Removes rows from a dataframe that have primary keys in the existing_df."""
+        if not self.primary_key:
+            return df
+
+        if self.primary_key not in df.columns:
+            logger.warning(f"Primary key '{self.primary_key}' not found in the dataframe. Skipping deduplication.")
+            return df
+        
+        existing_keys = existing_df[self.primary_key].tolist()
+        original_rows = len(df)
+        df = df[~df[self.primary_key].isin(existing_keys)] # type: ignore
+        rows_dropped = original_rows - len(df)
+        if rows_dropped > 0:
+            logger.info(f"Dropped {rows_dropped} records from the DataFrame as they already exist.")
+        return df
+
     def _process_dataframe(self, df: pandas.DataFrame):
         """Process the dataframe according to the schema, changing the column names and types."""
         self._check_schema(df)

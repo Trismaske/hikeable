@@ -38,15 +38,14 @@ class GCS(LocalFile):
 
     def load(self, df: pandas.DataFrame):
         """Load data to a local file and upload to GCS."""
+        blob = self.bucket.blob(self.gcs_path)
+        if blob.exists():
+            logger.info(f"Downloading existing file from GCS for deduplication: {self.gcs_path}")
+            os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
+            blob.download_to_filename(self.file_path)
+            logger.info("Download complete.")
+
         super().load(df)
         logger.info(f"Uploading \"{self.file_path}\" to GCS bucket \"{self.bucket_name}\" at \"{self.gcs_path}\"")
-        blob = self.bucket.blob(self.gcs_path)
         blob.upload_from_filename(self.file_path)
         logger.info(f"Upload to \"{self.bucket_name}:{self.gcs_path}\" complete.")
-
-    def upload_file(self, local_path: str, gcs_path: str):
-        """Uploads a local file to GCS."""
-        logger.info(f"Uploading \"{local_path}\" to GCS bucket \"{self.bucket_name}\" at \"{gcs_path}\"")
-        blob = self.bucket.blob(gcs_path)
-        blob.upload_from_filename(local_path)
-        logger.info(f"Upload to \"{self.bucket_name}:{gcs_path}\" complete.")

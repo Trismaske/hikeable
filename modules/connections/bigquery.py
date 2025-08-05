@@ -77,14 +77,9 @@ class BigQuery(BaseConnection):
             logger.info(f"Deduplicating data based on primary key: \"{self.primary_key}\"")
             query = f"SELECT {self.primary_key} FROM `{self.table_id}`"
             try:
-                existing_keys_df = self._query_to_dataframe(query)
-                if not existing_keys_df.empty and self.primary_key in existing_keys_df.columns:
-                    existing_keys = existing_keys_df[self.primary_key].tolist()
-                    original_rows = len(df)
-                    df = df[~df[self.primary_key].isin(existing_keys)] # type: ignore
-                    rows_dropped = original_rows - len(df)
-                    if rows_dropped > 0:
-                        logger.info(f"Dropped {rows_dropped} records from the DataFrame as they already exist in BigQuery.")
+                existing_df = self._query_to_dataframe(query)
+                if not existing_df.empty and self.primary_key in existing_df.columns:
+                    df = self._deduplicate_df(df, existing_df)
             except Exception as e:
                 logger.warning(f"Could not query existing keys from BigQuery. Proceeding without deduplication. Error: {e}")
 
