@@ -49,6 +49,11 @@ class BaseConnection:
             if set(found_columns) != set([field['name'] for field in self.config.config_data['schema']]):
                 raise ValueError("Dataframe columns do not match the schema.")
 
+    def _process_dataframe(self, df: pandas.DataFrame):
+        """Process the dataframe according to the schema, changing the column names and types."""
+        self._check_schema(df)
+        # To Do: update the schema to allow for different input and output column names, types, transformations and data quality checks
+
     def _deduplicate_df(self, df: pandas.DataFrame, existing_df: pandas.DataFrame) -> pandas.DataFrame:
         """Removes rows from a dataframe that already exist in existing_df."""
         if self.dedupe_using_all_columns:
@@ -80,11 +85,6 @@ class BaseConnection:
         if rows_dropped > 0:
             logger.info(f"Dropped {rows_dropped} records from the DataFrame as they already exist.")
         return df
-
-    def _process_dataframe(self, df: pandas.DataFrame):
-        """Process the dataframe according to the schema, changing the column names and types."""
-        self._check_schema(df)
-        # To Do: update the schema to allow for different input and output column names, types, transformations and data quality checks
 
     def extract(self) -> pandas.DataFrame:
         """Extract data from the source."""

@@ -6,7 +6,7 @@
         "query_params": {
             "latitude": "37.79",
             "longitude": "-122.47",
-            "hourly": "temperature_2m,precipitation_probability,apparent_temperature,dew_point_2m,relative_humidity_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,uv_index,visibility,pressure_msl,surface_pressure,wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_speed_180m,wind_direction_10m,wind_direction_80m,wind_direction_120m,wind_direction_180m,wind_gusts_10m,rain,showers,snowfall,precipitation,snow_depth,temperature_80m,temperature_120m,temperature_180m,uv_index_clear_sky,sunshine_duration,freezing_level_height",
+            "hourly": "temperature_2m,precipitation_probability,apparent_temperature,dew_point_2m,relative_humidity_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,uv_index,visibility,pressure_msl,surface_pressure,wind_speed_10m,wind_speed_80m,wind_speed_120m,wind_speed_180m,wind_direction_10m,wind_direction_80m,wind_direction_120m,wind_direction_180m,wind_gusts_10m,rain,showers,snowfall,precipitation,snow_depth,temperature_80m,temperature_120m,temperature_180m,uv_index_clear_sky,sunshine_duration,freezing_level_height,is_day",
             "past_days": "7",
             "forecast_days": "7"
         },
@@ -152,6 +152,10 @@
         {
             "name": "freezing_level_height",
             "type": "float64"
+        },
+        {
+            "name": "is_day",
+            "type": "int64"
         }
     ],
     "destination": {
