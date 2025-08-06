@@ -55,36 +55,35 @@ class BaseConnection:
         # To Do: update the schema to allow for different input and output column names, types, transformations and data quality checks
 
     def _deduplicate_df(self, df: pandas.DataFrame, existing_df: pandas.DataFrame) -> pandas.DataFrame:
-        """Removes rows from a dataframe that already exist in existing_df."""
+        """Merges a new dataframe with an existing one, handling duplicates and updates."""
+        rows_new = len(df)
+        rows_existing = len(existing_df)
+        logger.info(f"Merging new dataframe with {rows_new} rows and existing dataframe with {rows_existing} rows (Total rows: {rows_new + rows_existing}).")
+        merged_df = pandas.concat([existing_df, df], ignore_index=True)
+        rows_total_before_deduplication = len(merged_df)
+        if not self.primary_key and not self.dedupe_using_all_columns:
+            logger.info(f"No primary key or deduplication strategy set. Returning a simple concatenation of dataframes (Final rows: {rows_total_before_deduplication}).")
+            return merged_df
+        deduplicated_df = merged_df
         if self.dedupe_using_all_columns:
-            logger.info(f"Deduplicating data based on all columns.")
-            cols = df.columns.tolist()
-            merged_df = pandas.concat([existing_df, df], ignore_index=True)
-            deduplicated_df = merged_df.drop_duplicates(keep='last')
-            indicator_df = deduplicated_df.merge(existing_df, on=cols, how='left', indicator=True)
-            new_rows_df = indicator_df[indicator_df['_merge'] == 'left_only'][cols]
-            new_rows_df.reset_index(drop=True, inplace=True)
-            return new_rows_df # type: ignore
-
-        logger.info(f"Deduplicating data based on primary key: \"{self.primary_key}\"")
-        if not self.primary_key:
-            return df
-
-        if self.primary_key not in df.columns:
-            logger.warning(f"Primary key '{self.primary_key}' not found in the dataframe. Skipping deduplication.")
-            return df
-        
-        if self.primary_key not in existing_df.columns:
-            logger.warning(f"Primary key '{self.primary_key}' not found in the existing data. Skipping deduplication.")
-            return df
-
-        existing_keys = existing_df[self.primary_key].tolist()
-        original_rows = len(df)
-        df = df[~df[self.primary_key].isin(existing_keys)] # type: ignore
-        rows_dropped = original_rows - len(df)
-        if rows_dropped > 0:
-            logger.info(f"Dropped {rows_dropped} records from the DataFrame as they already exist.")
-        return df
+            logger.info("Deduplicating merged dataframe based on all columns.")
+            rows_before_all_cols_deduplication = len(deduplicated_df)
+            deduplicated_df = deduplicated_df.drop_duplicates(keep='last')
+            rows_after_all_cols_deduplication = len(deduplicated_df)
+            logger.info(f"Dropped {rows_before_all_cols_deduplication - rows_after_all_cols_deduplication} duplicates based on all columns. Processed dataframe now has {rows_after_all_cols_deduplication} rows.")
+        if self.primary_key:
+            logger.info(f"Deduplicating processed dataframe based on primary key: \"{self.primary_key}\"")
+            if self.primary_key not in df.columns:
+                logger.warning(f"Primary key '{self.primary_key}' not found in the new dataframe. Skipping primary key deduplication.")
+            elif self.primary_key not in existing_df.columns:
+                logger.warning(f"Primary key '{self.primary_key}' not found in the existing data. Skipping primary key deduplication.")
+            else:
+                rows_before_pk_deduplication = len(deduplicated_df)
+                deduplicated_df = deduplicated_df.drop_duplicates(subset=[self.primary_key], keep='last')
+                rows_after_pk_deduplication = len(deduplicated_df)
+                logger.info(f"Dropped {rows_before_pk_deduplication - rows_after_pk_deduplication} duplicates based on primary key '{self.primary_key}'. Processed dataframe now has {rows_after_pk_deduplication} rows.")
+        logger.info(f"Dropped {rows_total_before_deduplication - len(deduplicated_df)} rows in total. Final rows: {len(deduplicated_df)}")
+        return deduplicated_df.reset_index(drop=True)
 
     def extract(self) -> pandas.DataFrame:
         """Extract data from the source."""

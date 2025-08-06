@@ -48,6 +48,7 @@ python pipeline.py "configs/San Francisco.json"
 
 To make this pipeline production-ready, the following improvements should be made:
 
+- **Improved Delta Tracking**: Deltas should be trackable with a timestamp delta key such as `last_updated`. When delta's need to be tracked across all columns, this should be done via `MERGE` statements in the destination as opposed to downloading all existing data from the destination and deduplicating locally.
 - **Arrow Backend**: Ensure that Pandas is using Arrow instead of NumPy as it's backend.
 - **Scheduling & Automation**: Determine how to automate pipelines runs. This can be done by converting the pipeline into a daemon that scans the config files periodically and runs them according to their configured schedule, or using another tool such as Airflow.
 - **Schema Management**: The schema management should be expanded to include:

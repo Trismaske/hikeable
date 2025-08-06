@@ -26,7 +26,7 @@ class BigQuery(BaseConnection):
         if not self.table:
             raise ValueError(f"Config for {self.role} must include a 'table' key.")
         write_disposition = self.connection_config.get("write_disposition", "append")
-        self.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE if write_disposition == "truncate" else bigquery.WriteDisposition.WRITE_APPEND
+        self.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE if write_disposition == "truncate" or self.dedupe_using_all_columns else bigquery.WriteDisposition.WRITE_APPEND
         self.dataset_id = f"{self.project}.{dataset}"
         self.bq_client = bigquery.Client(project=self.project)
         try:
@@ -74,12 +74,8 @@ class BigQuery(BaseConnection):
         """Load data to BigQuery."""
         logger.info(f"Loading data to BigQuery table: \"{self.table_id}\"")
         if self.primary_key and self.table_exists:
-            if self.dedupe_using_all_columns:
-                query = f"SELECT * FROM `{self.table_id}`"
-            else:
-                query = f"SELECT {self.primary_key} FROM `{self.table_id}`"
             try:
-                existing_df = self._query_to_dataframe(query)
+                existing_df = self._query_to_dataframe(f"SELECT * FROM `{self.table_id}`")
                 if not existing_df.empty:
                     df = self._deduplicate_df(df, existing_df)
             except Exception as e:
