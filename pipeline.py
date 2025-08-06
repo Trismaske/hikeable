@@ -25,7 +25,7 @@ def connection_factory(role: str, config: Config):
         from modules.connections.bigquery import BigQuery
         return BigQuery(role, config)
     else:
-        raise ValueError(f"Unsupported source connection_type: {connection_type}")
+        raise ValueError(f"Unsupported {role} connection_type: \"{connection_type}\"")
 
 
 def main():

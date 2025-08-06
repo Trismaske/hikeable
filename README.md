@@ -6,7 +6,7 @@ The script then writes the data to the specified destination.
 
 The script can handle deltas either based only on primary key, or all columns.
 
-To update the data in the destination, simply run the pipeline again using the same command
+To update the data in the destination, simply run the pipeline again using the same command.
 
 ### Setup
 
@@ -33,7 +33,7 @@ Example:
 python pipeline.py "configs/San Francisco.json"
 ```
 
-### Design choices
+### Design Choices
 
 1. Python: Chosen primarily because it has so many libraries that make building integrations and working with data very easy, but also because of my familiarity with the language.
 2. GCP: Chosen for its broad set of data orientated services, including both a data warehouse (BigQuery) and BI Tool (Looker Studio) making it a good fit for this project. Again, my familiarity with the platform also played a role.
